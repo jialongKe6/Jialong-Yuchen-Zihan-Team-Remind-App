@@ -65,11 +65,11 @@ fun ReminderApp() {
     var reminderMessage by remember { mutableStateOf(TextFieldValue()) }
     var reminderDate by remember { mutableStateOf("") }
     var reminderTime by remember { mutableStateOf("") }
-    val reminders = remember { mutableStateListOf<Reminder>() }  // Store multiple reminders
+    val reminders = remember { mutableStateListOf<Reminder>() }
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
-    var nextReminderId by remember { mutableStateOf(1) } // Unique ID for each reminder
+    var nextReminderId by remember { mutableStateOf(1) }
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -84,7 +84,6 @@ fun ReminderApp() {
                     .padding(paddingValues)
                     .padding(16.dp)
             ) {
-                // Input fields for new reminder
                 TextField(
                     value = reminderMessage,
                     onValueChange = { reminderMessage = it },
@@ -103,7 +102,7 @@ fun ReminderApp() {
                         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH))
                         datePicker.show()
                     }) {
-                        Text("Select Date")
+                        Text(if (reminderDate.isNotEmpty()) reminderDate else "Select Date")
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
@@ -117,7 +116,7 @@ fun ReminderApp() {
                         }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), true)
                         timePicker.show()
                     }) {
-                        Text("Select Time")
+                        Text(if (reminderTime.isNotEmpty()) reminderTime else "Select Time")
                     }
                 }
 
@@ -130,7 +129,6 @@ fun ReminderApp() {
                             val reminder = Reminder(reminderId, reminderMessage.text, reminderDate, reminderTime)
                             reminders.add(reminder)
 
-                            // Set up the alarm for this reminder
                             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
                             val intent = Intent(context, ReminderReceiver::class.java).apply {
                                 putExtra("reminderMessage", reminder.message)
@@ -167,7 +165,6 @@ fun ReminderApp() {
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Display list of reminders
                 Text(text = "All Reminders:", fontSize = 20.sp, modifier = Modifier.padding(bottom = 8.dp))
                 LazyColumn {
                     items(reminders) { reminder ->
@@ -204,7 +201,6 @@ fun ReminderItem(reminder: Reminder, onDelete: () -> Unit) {
     }
 }
 
-// Function to cancel a reminder
 fun cancelReminder(context: Context, reminderId: Int) {
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val intent = Intent(context, ReminderReceiver::class.java)
